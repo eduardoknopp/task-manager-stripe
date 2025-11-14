@@ -8,16 +8,16 @@ export default function HomePage() {
         </p>
         <div className="flex gap-4 justify-center">
           <a
-            href="/dashboard"
+            href="/signin"
             className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
           >
-            Go to Dashboard
+            Sign In
           </a>
           <a
-            href="/auth/signin"
+            href="/signup"
             className="px-6 py-3 border border-border rounded-lg hover:bg-accent transition"
           >
-            Sign In
+            Sign Up
           </a>
         </div>
       </div>
