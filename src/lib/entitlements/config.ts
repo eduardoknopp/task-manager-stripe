@@ -7,7 +7,6 @@ import { SubscriptionPlan } from '@prisma/client'
 export const STRIPE_FEATURES = {
   TASK_PRIORITY: 'task_priority',
   TASK_TAGS: 'task_tags',
-  DATA_EXPORT: 'data_export',
 } as const
 
 export type StripeFeature = (typeof STRIPE_FEATURES)[keyof typeof STRIPE_FEATURES]
@@ -38,7 +37,6 @@ export type PlanFeature =
   | 'taskDueDate'
   | 'taskPriority'
   | 'taskTags'
-  | 'dataExport'
 
 /**
  * Map code features to Stripe lookup keys
@@ -52,7 +50,6 @@ export const FEATURE_TO_STRIPE: Record<PlanFeature, StripeFeature | null> = {
   // Premium features (require Stripe entitlement)
   taskPriority: STRIPE_FEATURES.TASK_PRIORITY,
   taskTags: STRIPE_FEATURES.TASK_TAGS,
-  dataExport: STRIPE_FEATURES.DATA_EXPORT,
 }
 
 /**
