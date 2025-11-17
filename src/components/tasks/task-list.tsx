@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Task {
@@ -18,15 +18,19 @@ interface Task {
   } | null
 }
 
-export function TaskList() {
+export interface TaskListRef {
+  refetch: () => void
+}
+
+interface TaskListProps {
+  onTaskChange?: () => void
+}
+
+export const TaskList = forwardRef<TaskListRef, TaskListProps>(function TaskList({ onTaskChange }, ref) {
   const router = useRouter()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'ALL' | 'TODO' | 'IN_PROGRESS' | 'DONE'>('ALL')
-
-  useEffect(() => {
-    fetchTasks()
-  }, [filter])
 
   async function fetchTasks() {
     try {
@@ -46,6 +50,14 @@ export function TaskList() {
     }
   }
 
+  useEffect(() => {
+    fetchTasks()
+  }, [filter])
+
+  useImperativeHandle(ref, () => ({
+    refetch: fetchTasks
+  }))
+
   async function deleteTask(id: string) {
     if (!confirm('Are you sure you want to delete this task?')) return
 
@@ -54,6 +66,7 @@ export function TaskList() {
       if (res.ok) {
         setTasks(tasks.filter(t => t.id !== id))
         router.refresh()
+        onTaskChange?.()
       }
     } catch (error) {
       console.error('Failed to delete task:', error)
@@ -73,6 +86,7 @@ export function TaskList() {
       if (res.ok) {
         fetchTasks()
         router.refresh()
+        onTaskChange?.()
       }
     } catch (error) {
       console.error('Failed to update task:', error)
@@ -161,4 +175,4 @@ export function TaskList() {
       )}
     </div>
   )
-}
+})

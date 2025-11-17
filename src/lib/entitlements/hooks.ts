@@ -11,15 +11,20 @@ export function useUsageStats() {
   const [usage, setUsage] = useState<UsageStats | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const fetchUsage = () => {
+    setLoading(true)
     fetch('/api/entitlements/usage')
       .then((res) => res.json())
       .then((data) => setUsage(data))
       .catch(() => setUsage(null))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchUsage()
   }, [])
 
-  return { usage, loading }
+  return { usage, loading, refetch: fetchUsage }
 }
 
 /**

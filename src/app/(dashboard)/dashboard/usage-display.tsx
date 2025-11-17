@@ -2,9 +2,18 @@
 
 import { useUsageStats } from '@/lib/entitlements/hooks'
 import { UsageBar } from '@/components/entitlements'
+import { forwardRef, useImperativeHandle } from 'react'
 
-export function UsageDisplay() {
-  const { usage, loading } = useUsageStats()
+export interface UsageDisplayRef {
+  refetch: () => void
+}
+
+export const UsageDisplay = forwardRef<UsageDisplayRef>(function UsageDisplay(props, ref) {
+  const { usage, loading, refetch } = useUsageStats()
+
+  useImperativeHandle(ref, () => ({
+    refetch
+  }))
 
   if (loading) {
     return (
@@ -24,21 +33,21 @@ export function UsageDisplay() {
 
   return (
     <div className="border border-border rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Uso do Plano {usage.plan}</h2>
+      <h2 className="text-xl font-bold mb-4">{usage.plan} Plan Usage</h2>
       <div className="space-y-4">
         <UsageBar
           current={usage.taskCount}
           max={usage.maxTasks}
-          label="Tarefas"
+          label="Tasks"
           type="tasks"
         />
         <UsageBar
           current={usage.projectCount}
           max={usage.maxProjects}
-          label="Projetos"
+          label="Projects"
           type="projects"
         />
       </div>
     </div>
   )
-}
+})
