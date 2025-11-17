@@ -28,7 +28,7 @@ export default async function BillingPage() {
             <ul className="space-y-2 mb-6">
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
-                <span>Up to 10 tasks</span>
+                <span>Up to 2 tasks</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
@@ -64,14 +64,6 @@ export default async function BillingPage() {
               <li className="flex items-start">
                 <span className="mr-2 text-primary">✓</span>
                 <span>Tags and labels</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-primary">✓</span>
-                <span>Due dates & reminders</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-primary">✓</span>
-                <span>Priority support</span>
               </li>
             </ul>
             {currentPlan === 'PRO' ? (

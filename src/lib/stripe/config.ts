@@ -12,8 +12,7 @@ export const STRIPE_PLANS = {
     price: 0,
     interval: null,
     features: [
-      'Up to 10 tasks',
-      '1 project',
+      'Up to 2 tasks',
       'Basic features',
     ],
   },
@@ -24,11 +23,8 @@ export const STRIPE_PLANS = {
     priceLookupKey: env.STRIPE_PRO_PRICE_LOOKUP_KEY,
     features: [
       'Unlimited tasks',
-      'Unlimited projects',
       'Task priorities',
       'Tags and labels',
-      'Due dates and reminders',
-      'Priority support',
     ],
   },
 } as const

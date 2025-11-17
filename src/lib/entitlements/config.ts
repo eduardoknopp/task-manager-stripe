@@ -18,7 +18,7 @@ export type StripeFeature = (typeof STRIPE_FEATURES)[keyof typeof STRIPE_FEATURE
  */
 export const DEFAULT_PLAN_LIMITS = {
   [SubscriptionPlan.FREE]: {
-    maxTasks: 10,
+    maxTasks: 2,
   },
   [SubscriptionPlan.PRO]: {
     maxTasks: Infinity,
@@ -56,7 +56,7 @@ export const FEATURE_TO_STRIPE: Record<PlanFeature, StripeFeature | null> = {
  * Error Messages
  */
 export const ERRORS = {
-  TASK_LIMIT: 'You have reached the task limit for the Free plan (10 tasks)',
+  TASK_LIMIT: 'You have reached the task limit for the Free plan (2 tasks)',
   FEATURE_UNAVAILABLE: 'This feature is not available on your plan',
   UPGRADE_REQUIRED: 'Upgrade to Pro to unlock this feature',
 } as const

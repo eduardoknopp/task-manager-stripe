@@ -6,7 +6,7 @@ export { SubscriptionPlan, SubscriptionStatus, TaskPriority, TaskStatus }
 // Entitlements configuration
 export const PLAN_LIMITS = {
   FREE: {
-    maxTasks: 10,
+    maxTasks: 2,
     canUseTags: false,
     canUsePriorities: false,
     canUseDueDates: false,

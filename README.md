@@ -10,7 +10,7 @@ This is a **SaaS task management application** with subscription-based entitleme
 
 | Feature | Free Plan | Pro Plan ($5/month) |
 |---------|-----------|---------------------|
-| **Tasks** | 10 max | ∞ Unlimited |
+| **Tasks** | 2 max | ∞ Unlimited |
 | **Tags & Labels** | ❌ | ✅ |
 | **Task Priorities** | ❌ | ✅ |
 | **Due Dates** | ❌ | ✅ |
