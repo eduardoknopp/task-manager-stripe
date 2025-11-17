@@ -2,7 +2,7 @@ import { env } from '@/lib/utils/env'
 
 export const STRIPE_CONFIG = {
   publishableKey: env.STRIPE_PUBLISHABLE_KEY,
-  proPriceId: env.STRIPE_PRO_PRICE_ID,
+  proPriceLookupKey: env.STRIPE_PRO_PRICE_LOOKUP_KEY,
   webhookSecret: env.STRIPE_WEBHOOK_SECRET,
 } as const
 
@@ -21,7 +21,7 @@ export const STRIPE_PLANS = {
     name: 'Pro',
     price: 5,
     interval: 'month' as const,
-    priceId: env.STRIPE_PRO_PRICE_ID,
+    priceLookupKey: env.STRIPE_PRO_PRICE_LOOKUP_KEY,
     features: [
       'Unlimited tasks',
       'Unlimited projects',

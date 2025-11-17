@@ -4,7 +4,7 @@ import { STRIPE_CONFIG } from './config'
 export interface CreateCheckoutSessionParams {
   userId: string
   userEmail: string
-  priceId?: string
+  priceLookupKey?: string
 }
 
 /**
@@ -23,16 +23,51 @@ function validateEmail(email: string): string {
 }
 
 /**
+ * Resolves price lookup key to actual price ID from Stripe
+ * Uses caching to avoid repeated API calls
+ */
+let priceCache: Map<string, { id: string; timestamp: number }> = new Map()
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+async function resolvePriceId(lookupKey: string): Promise<string> {
+  // Check cache first
+  const cached = priceCache.get(lookupKey)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.id
+  }
+
+  // Fetch from Stripe
+  const prices = await stripe.prices.list({
+    lookup_keys: [lookupKey],
+    limit: 1,
+  })
+
+  if (!prices.data.length) {
+    throw new Error(`Price with lookup key "${lookupKey}" not found in Stripe`)
+  }
+
+  const priceId = prices.data[0].id
+
+  // Cache result
+  priceCache.set(lookupKey, { id: priceId, timestamp: Date.now() })
+
+  return priceId
+}
+
+/**
  * Creates a Stripe Checkout Session for subscription
  */
 export async function createCheckoutSession({
   userId,
   userEmail,
-  priceId = STRIPE_CONFIG.proPriceId,
+  priceLookupKey = STRIPE_CONFIG.proPriceLookupKey,
 }: CreateCheckoutSessionParams) {
   try {
     // Validate email before sending to Stripe
     const validatedEmail = validateEmail(userEmail)
+
+    // Resolve lookup key to price ID
+    const priceId = await resolvePriceId(priceLookupKey)
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',

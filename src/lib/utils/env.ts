@@ -12,7 +12,7 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().startsWith('sk_'),
   STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
-  STRIPE_PRO_PRICE_ID: z.string().startsWith('price_'),
+  STRIPE_PRO_PRICE_LOOKUP_KEY: z.string().min(1),
 
   // App
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),

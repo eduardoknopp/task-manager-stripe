@@ -108,7 +108,7 @@ NEXTAUTH_SECRET="your-generated-secret-here"
 STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_PUBLISHABLE_KEY="pk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..." # Get after webhook setup
-STRIPE_PRO_PRICE_ID="price_..." # Create in Stripe Dashboard
+STRIPE_PRO_PRICE_LOOKUP_KEY="pro_monthly" # Configure in Stripe Dashboard
 ```
 
 ### 3. Start Docker Services
@@ -182,13 +182,19 @@ User 1:1 EntitlementUsage
 
 ## 💳 Stripe Configuration
 
-### 1. Create Products & Prices
+### 1. Create Products & Prices with Lookup Keys
 
 In [Stripe Dashboard](https://dashboard.stripe.com/test/products):
 
 1. Create **Pro Plan** product
 2. Add **$5/month** recurring price
-3. Copy the `price_id` to `.env` as `STRIPE_PRO_PRICE_ID`
+3. **Important:** In the price settings, add **Lookup key**: `pro_monthly`
+4. Update `.env` with `STRIPE_PRO_PRICE_LOOKUP_KEY="pro_monthly"`
+
+**Why Lookup Keys?**
+- ✅ Same config works across dev/staging/prod environments
+- ✅ Change prices in Stripe Dashboard without code changes
+- ✅ No need to manually copy `price_id` between environments
 
 ### 2. Configure Webhooks
 
