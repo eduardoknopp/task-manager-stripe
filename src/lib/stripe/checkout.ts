@@ -8,6 +8,21 @@ export interface CreateCheckoutSessionParams {
 }
 
 /**
+ * Validates and normalizes email address
+ */
+function validateEmail(email: string): string {
+  const trimmed = email.trim()
+
+  // Basic email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(trimmed)) {
+    throw new Error(`Invalid email format: ${trimmed}`)
+  }
+
+  return trimmed
+}
+
+/**
  * Creates a Stripe Checkout Session for subscription
  */
 export async function createCheckoutSession({
@@ -16,6 +31,9 @@ export async function createCheckoutSession({
   priceId = STRIPE_CONFIG.proPriceId,
 }: CreateCheckoutSessionParams) {
   try {
+    // Validate email before sending to Stripe
+    const validatedEmail = validateEmail(userEmail)
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -27,7 +45,7 @@ export async function createCheckoutSession({
       ],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/billing?canceled=true`,
-      customer_email: userEmail,
+      customer_email: validatedEmail,
       metadata: {
         userId,
       },
@@ -41,7 +59,7 @@ export async function createCheckoutSession({
     return { url: session.url, sessionId: session.id }
   } catch (error) {
     console.error('Error creating checkout session:', error)
-    throw new Error('Failed to create checkout session')
+    throw error
   }
 }
 

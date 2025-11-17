@@ -1,41 +1,17 @@
-'use client'
+import { auth } from '@/lib/auth'
+import { getUserSubscription } from '@/lib/stripe/subscription'
+import { redirect } from 'next/navigation'
+import { UpgradeButton } from './upgrade-button'
 
-import { useState } from 'react'
+export default async function BillingPage() {
+  const session = await auth()
 
-export default function BillingPage() {
-  const [loading, setLoading] = useState(false)
-
-  const handleUpgrade = async () => {
-    setLoading(true)
-
-    try {
-      // TODO: Get real user data from session
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: 'test-user-id',
-          userEmail: 'test@example.com',
-        }),
-      })
-
-      const { url, error } = await response.json()
-
-      if (error) {
-        alert(`Error: ${error}`)
-        return
-      }
-
-      if (url) {
-        window.location.href = url
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      alert('Failed to start checkout')
-    } finally {
-      setLoading(false)
-    }
+  if (!session?.user) {
+    redirect('/signin')
   }
+
+  const subscription = await getUserSubscription(session.user.id)
+  const currentPlan = subscription?.plan || 'FREE'
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -67,7 +43,7 @@ export default function BillingPage() {
               disabled
               className="w-full px-6 py-3 border border-border rounded-lg opacity-50 cursor-not-allowed"
             >
-              Current Plan
+              {currentPlan === 'FREE' ? 'Current Plan' : 'Downgrade'}
             </button>
           </div>
 
@@ -106,13 +82,19 @@ export default function BillingPage() {
                 <span>Priority support</span>
               </li>
             </ul>
-            <button
-              onClick={handleUpgrade}
-              disabled={loading}
-              className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition disabled:opacity-50"
-            >
-              {loading ? 'Loading...' : 'Upgrade to Pro'}
-            </button>
+            {currentPlan === 'PRO' ? (
+              <button
+                disabled
+                className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg opacity-50 cursor-not-allowed"
+              >
+                Current Plan
+              </button>
+            ) : (
+              <UpgradeButton
+                userId={session.user.id!}
+                userEmail={session.user.email!}
+              />
+            )}
           </div>
         </div>
       </div>

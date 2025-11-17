@@ -19,11 +19,17 @@ export interface UsageStats {
 
 /**
  * Get user's usage statistics
+ * Accepts ACTIVE, TRIALING, and INCOMPLETE statuses to handle payment processing delays
  */
 export async function getUserUsage(userId: string): Promise<UsageStats | null> {
   const [subscription, usage] = await Promise.all([
     prisma.subscription.findFirst({
-      where: { userId, status: 'ACTIVE' },
+      where: {
+        userId,
+        status: {
+          in: ['ACTIVE', 'TRIALING', 'INCOMPLETE']
+        }
+      },
       orderBy: { createdAt: 'desc' },
     }),
     prisma.entitlementUsage.findUnique({
@@ -90,13 +96,19 @@ export async function canCreateProject(userId: string): Promise<EntitlementResul
  * Check if user has access to a feature
  * For PRO users with Stripe features: Checks Stripe entitlements
  * For FREE users: Only basic features allowed
+ * Accepts ACTIVE, TRIALING, and INCOMPLETE statuses to handle payment processing delays
  */
 export async function hasFeatureAccess(
   userId: string,
   feature: PlanFeature
 ): Promise<EntitlementResult> {
   const subscription = await prisma.subscription.findFirst({
-    where: { userId, status: 'ACTIVE' },
+    where: {
+      userId,
+      status: {
+        in: ['ACTIVE', 'TRIALING', 'INCOMPLETE']
+      }
+    },
     orderBy: { createdAt: 'desc' },
   })
 

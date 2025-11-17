@@ -116,6 +116,11 @@ async function handleSubscriptionUpdate(event: Stripe.Event) {
   const plan = subscription.status === 'active' ? SubscriptionPlan.PRO : SubscriptionPlan.FREE
   const status = mapStripeStatus(subscription.status)
 
+  // Validate period end timestamp
+  const periodEnd = subscription.current_period_end
+    ? new Date(subscription.current_period_end * 1000)
+    : null
+
   await prisma.subscription.upsert({
     where: {
       stripeSubscriptionId: subscription.id,
@@ -124,7 +129,7 @@ async function handleSubscriptionUpdate(event: Stripe.Event) {
       plan,
       status,
       stripePriceId: subscription.items.data[0]?.price.id,
-      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      ...(periodEnd && { stripeCurrentPeriodEnd: periodEnd }),
     },
     create: {
       userId,
@@ -133,7 +138,7 @@ async function handleSubscriptionUpdate(event: Stripe.Event) {
       stripeCustomerId: subscription.customer as string,
       stripeSubscriptionId: subscription.id,
       stripePriceId: subscription.items.data[0]?.price.id,
-      stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      stripeCurrentPeriodEnd: periodEnd,
     },
   })
 
