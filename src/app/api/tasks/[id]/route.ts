@@ -11,7 +11,6 @@ const updateTaskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   dueDate: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  projectId: z.string().optional(),
 })
 
 // PATCH /api/tasks/[id] - Update task
@@ -49,15 +48,6 @@ export async function PATCH(
       data: {
         ...data,
         dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
-      },
-      include: {
-        project: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-          },
-        },
       },
     })
 

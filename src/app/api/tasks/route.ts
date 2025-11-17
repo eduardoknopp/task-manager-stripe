@@ -11,7 +11,6 @@ const createTaskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
   dueDate: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  projectId: z.string().optional(),
 })
 
 // GET /api/tasks - List user's tasks
@@ -24,7 +23,6 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
-  const projectId = searchParams.get('projectId')
 
   const where: any = {
     userId: session.user.id,
@@ -35,22 +33,9 @@ export async function GET(req: NextRequest) {
     where.status = status
   }
 
-  if (projectId) {
-    where.projectId = projectId
-  }
-
   const tasks = await prisma.task.findMany({
     where,
     orderBy: { createdAt: 'desc' },
-    include: {
-      project: {
-        select: {
-          id: true,
-          name: true,
-          color: true,
-        },
-      },
-    },
   })
 
   return NextResponse.json(tasks)
@@ -110,15 +95,6 @@ export async function POST(req: NextRequest) {
         ...data,
         userId,
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
-      },
-      include: {
-        project: {
-          select: {
-            id: true,
-            name: true,
-            color: true,
-          },
-        },
       },
     })
 

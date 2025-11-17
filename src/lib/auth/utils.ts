@@ -66,7 +66,6 @@ export async function createUser(email: string, password: string, name?: string)
     data: {
       userId: user.id,
       taskCount: 0,
-      projectCount: 0,
     },
   })
 
