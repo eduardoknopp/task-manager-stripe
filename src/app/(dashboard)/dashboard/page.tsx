@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { getUserSubscription } from '@/lib/stripe/subscription'
 import { redirect } from 'next/navigation'
 import { SignOutButton } from '@/components/auth/sign-out-button'
+import { UsageDisplay } from './usage-display'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -46,34 +47,27 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="border border-border rounded-lg p-6">
-              <p className="text-sm text-muted-foreground mb-1">Tasks</p>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-            <div className="border border-border rounded-lg p-6">
-              <p className="text-sm text-muted-foreground mb-1">Projects</p>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-            <div className="border border-border rounded-lg p-6">
-              <p className="text-sm text-muted-foreground mb-1">Completed</p>
-              <p className="text-3xl font-bold">0</p>
-            </div>
-          </div>
+          {/* Usage Stats with Entitlements */}
+          <UsageDisplay />
 
           {/* Quick Actions */}
           <div className="border border-border rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
             <div className="grid md:grid-cols-2 gap-4">
-              <button className="px-6 py-3 border border-border rounded-lg hover:bg-accent transition text-left">
-                <p className="font-medium">Create Task</p>
-                <p className="text-sm text-muted-foreground">Add a new task to your list</p>
-              </button>
-              <button className="px-6 py-3 border border-border rounded-lg hover:bg-accent transition text-left">
-                <p className="font-medium">New Project</p>
-                <p className="text-sm text-muted-foreground">Start organizing your tasks</p>
-              </button>
+              <a
+                href="/tasks"
+                className="px-6 py-3 border border-border rounded-lg hover:bg-accent transition text-left block"
+              >
+                <p className="font-medium">Manage Tasks</p>
+                <p className="text-sm text-muted-foreground">View and create tasks</p>
+              </a>
+              <a
+                href="/billing"
+                className="px-6 py-3 border border-border rounded-lg hover:bg-accent transition text-left block"
+              >
+                <p className="font-medium">Upgrade Plan</p>
+                <p className="text-sm text-muted-foreground">Unlock all features</p>
+              </a>
             </div>
           </div>
         </div>
