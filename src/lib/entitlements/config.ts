@@ -15,13 +15,15 @@ export type StripeFeature = (typeof STRIPE_FEATURES)[keyof typeof STRIPE_FEATURE
  * Default Numerical Limits by Plan (Fallback)
  * These are used when Stripe metadata is unavailable
  * PRO limits should be fetched from Stripe product metadata
+ *
+ * PRO Plan uses HYBRID model: 10 tasks included + overage billing for extra tasks
  */
 export const DEFAULT_PLAN_LIMITS = {
   [SubscriptionPlan.FREE]: {
     maxTasks: 2,
   },
   [SubscriptionPlan.PRO]: {
-    maxTasks: Infinity,
+    maxTasks: 10, // Included tasks, overage billing for 11+
   },
 } as const
 

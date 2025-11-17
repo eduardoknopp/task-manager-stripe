@@ -204,7 +204,44 @@ In [Stripe Dashboard](https://dashboard.stripe.com/test/products):
 - ✅ A/B test different limits without code changes
 - ✅ Single source of truth for plan configuration
 
-### 2. Configure Webhooks
+### 2. Configure Hybrid Pricing (10 Base + Overage)
+
+**Current Model:**
+- **FREE**: 2 tasks (hard limit)
+- **PRO**: 10 tasks included + $0.10 per extra task
+
+#### Step 2.1: Update Product Metadata
+
+1. Select **"Pro Plan"** product
+2. In **Metadata**, edit or add:
+   ```
+   Key: max_tasks
+   Value: 10
+   ```
+3. Save
+
+#### Step 2.2: Create Metered Price for Overage
+
+1. In **Pro Plan** product, click **"Add another price"**
+2. Configure:
+   - Price type: `Recurring`
+   - Billing period: `Monthly`
+   - Pricing model: `Usage based pricing` ⚡
+   - Usage aggregation: `Sum of usage values during period`
+   - Unit amount: `$0.10` (per extra task)
+3. Add **Lookup key**: `pro_monthly_overage`
+4. **Save**
+
+Now your Pro Plan has 2 prices:
+- `pro_monthly` → $5/month base (10 tasks included)
+- `pro_monthly_overage` → $0.10/task for 11+
+
+**How Billing Works:**
+- User creates 15 tasks in a month
+- Invoice: $5 (base) + $0.50 (5 × $0.10) = $5.50 total
+- Overage automatically calculated by Stripe
+
+### 3. Configure Webhooks
 
 In [Stripe Webhooks](https://dashboard.stripe.com/test/webhooks):
 
@@ -217,7 +254,7 @@ In [Stripe Webhooks](https://dashboard.stripe.com/test/webhooks):
    - `invoice.payment_failed`
 3. Copy webhook secret to `.env` as `STRIPE_WEBHOOK_SECRET`
 
-### 3. Test Payments
+### 4. Test Payments
 
 Use Stripe test cards:
 - **Success**: `4242 4242 4242 4242`

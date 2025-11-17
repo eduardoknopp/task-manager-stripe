@@ -22,7 +22,8 @@ export const STRIPE_PLANS = {
     interval: 'month' as const,
     priceLookupKey: env.STRIPE_PRO_PRICE_LOOKUP_KEY,
     features: [
-      'Unlimited tasks',
+      '10 tasks included',
+      '$0.10 per extra task',
       'Task priorities',
       'Tags and labels',
     ],

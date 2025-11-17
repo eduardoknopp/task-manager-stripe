@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma'
 import { stripe } from '@/lib/stripe/client'
 import { FEATURE_TO_STRIPE, ERRORS, PlanFeature } from './config'
 import { getPlanLimits } from './limits'
+import { reportUsageToStripe } from '@/lib/stripe/usage'
 
 export interface EntitlementResult {
   allowed: boolean
@@ -51,6 +52,8 @@ export async function getUserUsage(userId: string): Promise<UsageStats | null> {
 
 /**
  * Check if user can create a task
+ * FREE: Hard limit (2 tasks max)
+ * PRO: Soft limit (10 included, allows overage with metered billing)
  */
 export async function canCreateTask(userId: string): Promise<EntitlementResult> {
   const usage = await getUserUsage(userId)
@@ -59,14 +62,19 @@ export async function canCreateTask(userId: string): Promise<EntitlementResult> 
     return { allowed: false, reason: 'Subscription not found' }
   }
 
-  if (usage.taskCount >= usage.maxTasks) {
-    return {
-      allowed: false,
-      reason: ERRORS.TASK_LIMIT,
-      upgradeRequired: usage.plan === SubscriptionPlan.FREE,
+  // FREE plan: Hard limit (block after 2 tasks)
+  if (usage.plan === SubscriptionPlan.FREE) {
+    if (usage.taskCount >= usage.maxTasks) {
+      return {
+        allowed: false,
+        reason: ERRORS.TASK_LIMIT,
+        upgradeRequired: true,
+      }
     }
   }
 
+  // PRO plan: Soft limit (allow overage, will be billed)
+  // No blocking, just report usage to Stripe for metered billing
   return { allowed: true }
 }
 
@@ -142,11 +150,18 @@ export async function hasFeatureAccess(
 
 /**
  * Increment/Decrement usage counters
+ * Also reports to Stripe for metered billing (if configured)
  */
 export async function incrementTaskCount(userId: string) {
+  // Update local counter
   await prisma.entitlementUsage.update({
     where: { userId },
     data: { taskCount: { increment: 1 } },
+  })
+
+  // Report to Stripe for metered billing (non-blocking)
+  reportUsageToStripe(userId, 1).catch((error) => {
+    console.error('Failed to report usage to Stripe:', error)
   })
 }
 
@@ -155,4 +170,7 @@ export async function decrementTaskCount(userId: string) {
     where: { userId },
     data: { taskCount: { decrement: 1 } },
   })
+
+  // Note: We don't report negative usage to Stripe
+  // Deletions don't affect metered billing
 }

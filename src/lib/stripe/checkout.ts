@@ -56,6 +56,7 @@ async function resolvePriceId(lookupKey: string): Promise<string> {
 
 /**
  * Creates a Stripe Checkout Session for subscription
+ * PRO plan includes 2 prices: base (recurring) + metered (overage)
  */
 export async function createCheckoutSession({
   userId,
@@ -66,16 +67,24 @@ export async function createCheckoutSession({
     // Validate email before sending to Stripe
     const validatedEmail = validateEmail(userEmail)
 
-    // Resolve lookup key to price ID
-    const priceId = await resolvePriceId(priceLookupKey)
+    // Resolve base price (recurring fixed price)
+    const basePriceId = await resolvePriceId(priceLookupKey)
+
+    // Resolve metered price (overage billing)
+    const meteredPriceId = await resolvePriceId('pro_monthly_overage')
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId,
+          // Base recurring price ($5/month for 10 tasks)
+          price: basePriceId,
           quantity: 1,
+        },
+        {
+          // Metered price ($0.10 per extra task)
+          price: meteredPriceId,
         },
       ],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
