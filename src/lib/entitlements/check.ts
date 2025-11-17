@@ -1,7 +1,8 @@
 import { SubscriptionPlan } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
 import { stripe } from '@/lib/stripe/client'
-import { PLAN_LIMITS, FEATURE_TO_STRIPE, ERRORS, PlanFeature } from './config'
+import { FEATURE_TO_STRIPE, ERRORS, PlanFeature } from './config'
+import { getPlanLimits } from './limits'
 
 export interface EntitlementResult {
   allowed: boolean
@@ -18,6 +19,7 @@ export interface UsageStats {
 /**
  * Get user's usage statistics
  * Accepts ACTIVE, TRIALING, and INCOMPLETE statuses to handle payment processing delays
+ * Fetches limits dynamically from Stripe product metadata
  */
 export async function getUserUsage(userId: string): Promise<UsageStats | null> {
   const [subscription, usage] = await Promise.all([
@@ -37,7 +39,8 @@ export async function getUserUsage(userId: string): Promise<UsageStats | null> {
 
   if (!subscription || !usage) return null
 
-  const limits = PLAN_LIMITS[subscription.plan]
+  // Fetch limits dynamically from Stripe (with fallback to defaults)
+  const limits = await getPlanLimits(subscription.stripePriceId, subscription.plan)
 
   return {
     taskCount: usage.taskCount,

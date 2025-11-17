@@ -13,10 +13,11 @@ export const STRIPE_FEATURES = {
 export type StripeFeature = (typeof STRIPE_FEATURES)[keyof typeof STRIPE_FEATURES]
 
 /**
- * Numerical Limits by Plan
- * Managed in code, not in Stripe
+ * Default Numerical Limits by Plan (Fallback)
+ * These are used when Stripe metadata is unavailable
+ * PRO limits should be fetched from Stripe product metadata
  */
-export const PLAN_LIMITS = {
+export const DEFAULT_PLAN_LIMITS = {
   [SubscriptionPlan.FREE]: {
     maxTasks: 10,
   },
@@ -24,6 +25,10 @@ export const PLAN_LIMITS = {
     maxTasks: Infinity,
   },
 } as const
+
+export type PlanLimits = {
+  maxTasks: number
+}
 
 /**
  * Feature Names (used in code)

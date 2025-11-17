@@ -182,19 +182,27 @@ User 1:1 EntitlementUsage
 
 ## 💳 Stripe Configuration
 
-### 1. Create Products & Prices with Lookup Keys
+### 1. Create Products & Prices with Lookup Keys + Metadata
 
 In [Stripe Dashboard](https://dashboard.stripe.com/test/products):
 
 1. Create **Pro Plan** product
 2. Add **$5/month** recurring price
 3. **Important:** In the price settings, add **Lookup key**: `pro_monthly`
-4. Update `.env` with `STRIPE_PRO_PRICE_LOOKUP_KEY="pro_monthly"`
+4. **Important:** In the product settings, add **Metadata**:
+   - Key: `max_tasks` | Value: `unlimited` (or a number like "100")
+5. Update `.env` with `STRIPE_PRO_PRICE_LOOKUP_KEY="pro_monthly"`
 
 **Why Lookup Keys?**
 - ✅ Same config works across dev/staging/prod environments
 - ✅ Change prices in Stripe Dashboard without code changes
 - ✅ No need to manually copy `price_id` between environments
+
+**Why Metadata for Limits?**
+- ✅ Change task limits in Stripe Dashboard without deploying code
+- ✅ Create new plan tiers (Starter, Business) instantly
+- ✅ A/B test different limits without code changes
+- ✅ Single source of truth for plan configuration
 
 ### 2. Configure Webhooks
 
