@@ -4,14 +4,13 @@ A modern, enterprise-grade task management application built with Next.js 15, Ty
 
 ## 📋 Project Overview
 
-This is a **SaaS task management application** with subscription-based entitlements powered by Stripe. Users can manage tasks and projects with different feature access levels based on their subscription plan.
+This is a **SaaS task management application** with subscription-based entitlements powered by Stripe. Users can manage tasks with different feature access levels based on their subscription plan.
 
 ### Subscription Plans
 
 | Feature | Free Plan | Pro Plan ($5/month) |
 |---------|-----------|---------------------|
 | **Tasks** | 10 max | ∞ Unlimited |
-| **Projects** | 1 max | ∞ Unlimited |
 | **Tags & Labels** | ❌ | ✅ |
 | **Task Priorities** | ❌ | ✅ |
 | **Due Dates** | ❌ | ✅ |
@@ -22,7 +21,7 @@ This is a **SaaS task management application** with subscription-based entitleme
 - **Next.js 15** - React framework with App Router
 - **TypeScript** - Type-safe development
 - **Tailwind CSS 4** - Utility-first styling
-- **Shadcn/ui** - Modern component library
+- **React 19** - Latest React features
 
 ### Backend
 - **Next.js Server Actions** - Server-side logic
@@ -44,9 +43,6 @@ This is a **SaaS task management application** with subscription-based entitleme
 
 ```
 task-manager-stripe/
-├── docker/
-│   ├── postgres/          # PostgreSQL initialization
-│   └── nginx/             # Nginx configs (production)
 ├── prisma/
 │   ├── schema.prisma      # Database schema
 │   └── migrations/        # SQL migrations
@@ -55,19 +51,21 @@ task-manager-stripe/
 │   │   ├── (auth)/       # Auth routes (signin, signup)
 │   │   ├── (dashboard)/  # Protected dashboard routes
 │   │   ├── api/          # API routes (webhooks, etc)
+│   │   ├── billing/      # Billing and upgrade pages
 │   │   ├── layout.tsx    # Root layout
 │   │   └── page.tsx      # Homepage
 │   ├── components/        # React components
-│   │   ├── ui/           # Shadcn components
-│   │   ├── tasks/        # Task management UI
-│   │   ├── billing/      # Subscription UI
-│   │   └── projects/     # Project UI
+│   │   ├── auth/         # Authentication components
+│   │   ├── entitlements/ # Feature gates and usage tracking
+│   │   └── tasks/        # Task management UI
 │   ├── lib/              # Utilities
 │   │   ├── auth/         # NextAuth config
+│   │   ├── entitlements/ # Entitlement checking logic
 │   │   ├── stripe/       # Stripe utilities
 │   │   ├── db/           # Prisma client
 │   │   └── utils/        # Helpers
-│   └── types/            # TypeScript types
+│   ├── types/            # TypeScript types
+│   └── middleware.ts     # Auth and route protection
 ├── docker-compose.yml     # Docker orchestration
 ├── Dockerfile             # Multi-stage build
 └── package.json           # Dependencies
@@ -169,7 +167,6 @@ Visit [http://localhost:3000](http://localhost:3000)
 ### Key Models
 
 - **User** - User accounts with NextAuth.js integration
-- **Project** - Task containers with soft deletes
 - **Task** - Individual tasks with status, priority, tags
 - **Subscription** - Stripe subscription tracking
 - **EntitlementUsage** - Real-time usage limits tracking
@@ -178,11 +175,9 @@ Visit [http://localhost:3000](http://localhost:3000)
 ### Relationships
 
 ```
-User 1:N Project
 User 1:N Task
 User 1:N Subscription
 User 1:1 EntitlementUsage
-Project 1:N Task
 ```
 
 ## 💳 Stripe Configuration

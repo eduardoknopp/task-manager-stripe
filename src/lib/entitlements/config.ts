@@ -7,7 +7,6 @@ import { SubscriptionPlan } from '@prisma/client'
 export const STRIPE_FEATURES = {
   TASK_PRIORITY: 'task_priority',
   TASK_TAGS: 'task_tags',
-  PROJECT_COLORS: 'project_colors',
   DATA_EXPORT: 'data_export',
 } as const
 
@@ -20,11 +19,9 @@ export type StripeFeature = (typeof STRIPE_FEATURES)[keyof typeof STRIPE_FEATURE
 export const PLAN_LIMITS = {
   [SubscriptionPlan.FREE]: {
     maxTasks: 10,
-    maxProjects: 2,
   },
   [SubscriptionPlan.PRO]: {
     maxTasks: Infinity,
-    maxProjects: Infinity,
   },
 } as const
 
@@ -34,10 +31,8 @@ export const PLAN_LIMITS = {
 export type PlanFeature =
   | 'taskCreation'
   | 'taskDueDate'
-  | 'projectCreation'
   | 'taskPriority'
   | 'taskTags'
-  | 'projectColors'
   | 'dataExport'
 
 /**
@@ -48,12 +43,10 @@ export const FEATURE_TO_STRIPE: Record<PlanFeature, StripeFeature | null> = {
   // Basic features (always available)
   taskCreation: null,
   taskDueDate: null,
-  projectCreation: null,
 
   // Premium features (require Stripe entitlement)
   taskPriority: STRIPE_FEATURES.TASK_PRIORITY,
   taskTags: STRIPE_FEATURES.TASK_TAGS,
-  projectColors: STRIPE_FEATURES.PROJECT_COLORS,
   dataExport: STRIPE_FEATURES.DATA_EXPORT,
 }
 
@@ -62,7 +55,6 @@ export const FEATURE_TO_STRIPE: Record<PlanFeature, StripeFeature | null> = {
  */
 export const ERRORS = {
   TASK_LIMIT: 'You have reached the task limit for the Free plan (10 tasks)',
-  PROJECT_LIMIT: 'You have reached the project limit for the Free plan (2 projects)',
   FEATURE_UNAVAILABLE: 'This feature is not available on your plan',
   UPGRADE_REQUIRED: 'Upgrade to Pro to unlock this feature',
 } as const

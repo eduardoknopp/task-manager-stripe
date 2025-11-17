@@ -11,9 +11,7 @@ export interface EntitlementResult {
 
 export interface UsageStats {
   taskCount: number
-  projectCount: number
   maxTasks: number
-  maxProjects: number
   plan: SubscriptionPlan
 }
 
@@ -43,9 +41,7 @@ export async function getUserUsage(userId: string): Promise<UsageStats | null> {
 
   return {
     taskCount: usage.taskCount,
-    projectCount: usage.projectCount,
     maxTasks: limits.maxTasks,
-    maxProjects: limits.maxProjects,
     plan: subscription.plan,
   }
 }
@@ -71,26 +67,6 @@ export async function canCreateTask(userId: string): Promise<EntitlementResult> 
   return { allowed: true }
 }
 
-/**
- * Check if user can create a project
- */
-export async function canCreateProject(userId: string): Promise<EntitlementResult> {
-  const usage = await getUserUsage(userId)
-
-  if (!usage) {
-    return { allowed: false, reason: 'Subscription not found' }
-  }
-
-  if (usage.projectCount >= usage.maxProjects) {
-    return {
-      allowed: false,
-      reason: ERRORS.PROJECT_LIMIT,
-      upgradeRequired: usage.plan === SubscriptionPlan.FREE,
-    }
-  }
-
-  return { allowed: true }
-}
 
 /**
  * Check if user has access to a feature
@@ -175,19 +151,5 @@ export async function decrementTaskCount(userId: string) {
   await prisma.entitlementUsage.update({
     where: { userId },
     data: { taskCount: { decrement: 1 } },
-  })
-}
-
-export async function incrementProjectCount(userId: string) {
-  await prisma.entitlementUsage.update({
-    where: { userId },
-    data: { projectCount: { increment: 1 } },
-  })
-}
-
-export async function decrementProjectCount(userId: string) {
-  await prisma.entitlementUsage.update({
-    where: { userId },
-    data: { projectCount: { decrement: 1 } },
   })
 }

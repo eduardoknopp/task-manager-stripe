@@ -149,7 +149,6 @@ async function handleSubscriptionUpdate(event: Stripe.Event) {
     create: {
       userId,
       taskCount: 0,
-      projectCount: 0,
     },
   })
 

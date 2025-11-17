@@ -32,10 +32,6 @@ export default async function BillingPage() {
               </li>
               <li className="flex items-start">
                 <span className="mr-2">✓</span>
-                <span>1 project</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2">✓</span>
                 <span>Basic features</span>
               </li>
             </ul>
@@ -60,10 +56,6 @@ export default async function BillingPage() {
               <li className="flex items-start">
                 <span className="mr-2 text-primary">✓</span>
                 <span>Unlimited tasks</span>
-              </li>
-              <li className="flex items-start">
-                <span className="mr-2 text-primary">✓</span>
-                <span>Unlimited projects</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2 text-primary">✓</span>

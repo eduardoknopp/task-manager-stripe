@@ -12,11 +12,6 @@ interface Task {
   tags: string[]
   dueDate: string | null
   createdAt: string
-  project: {
-    id: string
-    name: string
-    color: string | null
-  } | null
 }
 
 export interface TaskListRef {

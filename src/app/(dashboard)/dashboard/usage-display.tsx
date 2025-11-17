@@ -41,12 +41,6 @@ export const UsageDisplay = forwardRef<UsageDisplayRef>(function UsageDisplay(pr
           label="Tasks"
           type="tasks"
         />
-        <UsageBar
-          current={usage.projectCount}
-          max={usage.maxProjects}
-          label="Projects"
-          type="projects"
-        />
       </div>
     </div>
   )

@@ -4,10 +4,10 @@ interface UsageBarProps {
   current: number
   max: number
   label: string
-  type?: 'tasks' | 'projects'
+  type?: 'tasks'
 }
 
-export function UsageBar({ current, max, label, type = 'tasks' }: UsageBarProps) {
+export function UsageBar({ current, max, label }: UsageBarProps) {
   const percentage = max === Infinity ? 0 : Math.min((current / max) * 100, 100)
   const isNearLimit = percentage >= 80 && percentage < 100
   const isAtLimit = percentage >= 100
