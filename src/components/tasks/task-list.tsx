@@ -9,6 +9,7 @@ interface Task {
   description: string | null
   status: 'TODO' | 'IN_PROGRESS' | 'DONE'
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | null
+  tags: string[]
   dueDate: string | null
   createdAt: string
   project: {
@@ -102,6 +103,16 @@ export const TaskList = forwardRef<TaskListRef, TaskListProps>(function TaskList
     }
   }
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'LOW': return 'bg-blue-100 text-blue-700'
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-700'
+      case 'HIGH': return 'bg-orange-100 text-orange-700'
+      case 'URGENT': return 'bg-red-100 text-red-700'
+      default: return 'bg-gray-100'
+    }
+  }
+
   if (loading) {
     return <div className="text-center py-8">Loading tasks...</div>
   }
@@ -151,10 +162,20 @@ export const TaskList = forwardRef<TaskListRef, TaskListProps>(function TaskList
                   {task.description && (
                     <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
                   )}
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className={`text-xs px-2 py-1 rounded ${getStatusColor(task.status)}`}>
                       {task.status.replace('_', ' ')}
                     </span>
+                    {task.priority && (
+                      <span className={`text-xs px-2 py-1 rounded font-medium ${getPriorityColor(task.priority)}`}>
+                        {task.priority}
+                      </span>
+                    )}
+                    {task.tags && task.tags.length > 0 && task.tags.map((tag) => (
+                      <span key={tag} className="text-xs px-2 py-1 rounded bg-purple-100 text-purple-700">
+                        #{tag}
+                      </span>
+                    ))}
                     {task.dueDate && (
                       <span className="text-xs text-muted-foreground">
                         Due: {new Date(task.dueDate).toLocaleDateString()}

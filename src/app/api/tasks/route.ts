@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db/prisma'
-import { canCreateTask, incrementTaskCount } from '@/lib/entitlements/check'
+import { canCreateTask, incrementTaskCount, hasFeatureAccess } from '@/lib/entitlements/check'
 import { z } from 'zod'
 
 const createTaskSchema = z.object({
@@ -82,6 +82,27 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const data = createTaskSchema.parse(body)
+
+    // Validate PRO features
+    if (data.priority) {
+      const priorityAccess = await hasFeatureAccess(userId, 'taskPriority')
+      if (!priorityAccess.allowed) {
+        return NextResponse.json(
+          { error: 'Task priorities are a PRO feature', upgradeRequired: true },
+          { status: 403 }
+        )
+      }
+    }
+
+    if (data.tags && data.tags.length > 0) {
+      const tagsAccess = await hasFeatureAccess(userId, 'taskTags')
+      if (!tagsAccess.allowed) {
+        return NextResponse.json(
+          { error: 'Task tags are a PRO feature', upgradeRequired: true },
+          { status: 403 }
+        )
+      }
+    }
 
     // Create task
     const task = await prisma.task.create({

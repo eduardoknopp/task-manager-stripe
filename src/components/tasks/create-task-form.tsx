@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UpgradePrompt } from '@/components/entitlements'
+import { UpgradePrompt, FeatureGate } from '@/components/entitlements'
 
 interface CreateTaskFormProps {
   onSuccess?: () => void
@@ -19,8 +19,12 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
     title: '',
     description: '',
     status: 'TODO' as 'TODO' | 'IN_PROGRESS' | 'DONE',
+    priority: '' as '' | 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT',
+    tags: [] as string[],
     dueDate: '',
   })
+
+  const [tagInput, setTagInput] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,7 +52,8 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
       }
 
       // Success
-      setFormData({ title: '', description: '', status: 'TODO', dueDate: '' })
+      setFormData({ title: '', description: '', status: 'TODO', priority: '', tags: [], dueDate: '' })
+      setTagInput('')
       router.refresh()
       onSuccess?.()
     } catch (err) {
@@ -56,6 +61,17 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  function addTag() {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData({ ...formData, tags: [...formData.tags, tagInput.trim()] })
+      setTagInput('')
+    }
+  }
+
+  function removeTag(tag: string) {
+    setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) })
   }
 
   if (upgradeRequired && error) {
@@ -115,6 +131,72 @@ export function CreateTaskForm({ onSuccess, onCancel }: CreateTaskFormProps) {
           <option value="DONE">Done</option>
         </select>
       </div>
+
+      {/* Priority - PRO Feature */}
+      <FeatureGate feature="taskPriority">
+        <div>
+          <label htmlFor="priority" className="block text-sm font-medium mb-1">
+            Priority <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full ml-1">PRO</span>
+          </label>
+          <select
+            id="priority"
+            value={formData.priority}
+            onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+            className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">None</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+        </div>
+      </FeatureGate>
+
+      {/* Tags - PRO Feature */}
+      <FeatureGate feature="taskTags">
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Tags <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full ml-1">PRO</span>
+          </label>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+              className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Add a tag and press Enter"
+            />
+            <button
+              type="button"
+              onClick={addTag}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+            >
+              Add
+            </button>
+          </div>
+          {formData.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {formData.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded text-sm"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="hover:text-red-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </FeatureGate>
 
       <div>
         <label htmlFor="dueDate" className="block text-sm font-medium mb-1">

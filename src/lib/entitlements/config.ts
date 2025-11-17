@@ -61,8 +61,8 @@ export const FEATURE_TO_STRIPE: Record<PlanFeature, StripeFeature | null> = {
  * Error Messages
  */
 export const ERRORS = {
-  TASK_LIMIT: 'Você atingiu o limite de tarefas do plano Free (10 tarefas)',
-  PROJECT_LIMIT: 'Você atingiu o limite de projetos do plano Free (2 projetos)',
-  FEATURE_UNAVAILABLE: 'Esta funcionalidade não está disponível no seu plano',
-  UPGRADE_REQUIRED: 'Faça upgrade para Pro para desbloquear esta funcionalidade',
+  TASK_LIMIT: 'You have reached the task limit for the Free plan (10 tasks)',
+  PROJECT_LIMIT: 'You have reached the project limit for the Free plan (2 projects)',
+  FEATURE_UNAVAILABLE: 'This feature is not available on your plan',
+  UPGRADE_REQUIRED: 'Upgrade to Pro to unlock this feature',
 } as const
